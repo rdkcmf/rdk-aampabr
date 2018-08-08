@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <sys/time.h>
+#include <cstring>
 
 #if !(defined(WIN32) || defined(__APPLE__))
 #if defined(USE_SYSTEMD_JOURNAL_PRINT)
