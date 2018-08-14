@@ -316,7 +316,7 @@ int ABRManager::getRampedDownProfileIndex(int currentProfileIndex) {
   SortedBWProfileListIter iter = mSortedBWProfileList.find(currentBandwidth);
   if (iter == mSortedBWProfileList.end()) {
     sLogger("%s:%d The current bitrate %ld is not in the profile list\n",
-       currentBandwidth, __FUNCTION__, __LINE__);
+       __FUNCTION__, __LINE__, currentBandwidth);
     return desiredProfileIndex;
   }
   if (iter == mSortedBWProfileList.begin()) {
