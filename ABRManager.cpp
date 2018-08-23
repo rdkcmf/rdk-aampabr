@@ -384,8 +384,10 @@ int ABRManager::getProfileIndexByBitrateRampUpOrDown(int currentProfileIndex, lo
   int desiredProfileIndex = currentProfileIndex;
   if (networkBandwidth == -1) {
     // If the network bandwidth is not available, just reset the profile change up/down count.
+#if defined(DEBUG_ENABLED)
     sLogger("%s:%d No network bandwidth info available , not changing profile[%d]\n",
       __FUNCTION__, __LINE__, currentProfileIndex);
+#endif
     mAbrProfileChangeUpCount = 0;
     mAbrProfileChangeDownCount = 0;
     return desiredProfileIndex;
