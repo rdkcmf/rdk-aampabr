@@ -83,10 +83,22 @@ static int defaultLogger(const char* fmt, ...) {
   send_logs_to_syslog(logBuf);
 #endif
   return ret;
+#else // ENABLE_RDK_LOGGER
+#ifdef WIN32
+  static bool init;
+  FILE *f = fopen("d:/tmp/aampabr.log", (init ? "a" : "w"));
+  if (f)
+  {
+	init = true;
+	fprintf(f, "%s", logBuf);
+	fclose(f);
+  }
+  return printf("%s", logBuf);
 #else
   struct timeval t;
   gettimeofday(&t, NULL);
   return printf("%ld:%3ld : %s\n", t.tv_sec, t.tv_usec / 1000, logBuf);
+#endif
 #endif
 }
 
