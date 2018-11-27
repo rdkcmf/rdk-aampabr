@@ -38,6 +38,11 @@
 static const int MAX_LOG_BUFF_SIZE = 1024;
 
 /**
+ * @brief Log file directory index - To support dynamic directory configuration for abr logging 
+ */
+static char gsLogDirectory[] = "c:/tmp/aampabr.log";
+
+/**
  * @brief Module name
  */
 static const char *moduleName = "[ABRManager] ";
@@ -86,7 +91,7 @@ static int defaultLogger(const char* fmt, ...) {
 #else // ENABLE_RDK_LOGGER
 #ifdef WIN32
   static bool init;
-  FILE *f = fopen("d:/tmp/aampabr.log", (init ? "a" : "w"));
+  FILE *f = fopen(gsLogDirectory, (init ? "a" : "w"));
   if (f)
   {
 	init = true;
@@ -97,7 +102,7 @@ static int defaultLogger(const char* fmt, ...) {
 #else
   struct timeval t;
   gettimeofday(&t, NULL);
-  return printf("%ld:%3ld : %s\n", t.tv_sec, t.tv_usec / 1000, logBuf);
+  return printf("%ld:%3ld : %s\n", (long int)t.tv_sec, (long int)t.tv_usec / 1000, logBuf);
 #endif
 #endif
 }
@@ -605,4 +610,11 @@ void ABRManager::setLogger(LoggerFuncType logger) {
 void ABRManager::disableLogger() {
   // Set the empty logger
   sLogger = emptyLogger;
+}
+
+/**
+ * @brief Set the simulator log file directory index.
+ */
+void ABRManager::setLogDirectory(char driveName) {
+  gsLogDirectory[0] = driveName;
 }

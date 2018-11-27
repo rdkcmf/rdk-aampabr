@@ -198,6 +198,11 @@ public:
    */
   static void disableLogger();
 
+  /**
+   * @brief Configure the simulator log file directory.
+   */
+  void setLogDirectory(char driveName);
+
 private:
   // Inner functions
 
