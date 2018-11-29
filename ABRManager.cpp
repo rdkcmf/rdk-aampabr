@@ -120,7 +120,8 @@ ABRManager::ABRManager() :
   mDesiredIframeProfile(0),
   mAbrProfileChangeUpCount(0),
   mAbrProfileChangeDownCount(0),
-  mLowestIframeProfile(INVALID_PROFILE) {
+  mLowestIframeProfile(INVALID_PROFILE),
+  mDefaultIframeBitrate(0) {
 
 }
 
@@ -234,36 +235,44 @@ void ABRManager::updateProfile() {
       is4K = true;
     }
 
-    if(is4K) {
-      // Get the default profile of 4k video , apply same bandwidth of video to iframe also
-      int desiredProfileIndexNonIframe = getProfileCount() / 2; 
-      int desiredProfileNonIframeBW = mProfiles[desiredProfileIndexNonIframe].bandwidthBitsPerSecond ;
-      mDesiredIframeProfile = mLowestIframeProfile = 0;
+    if (mDefaultIframeBitrate > 0) {
+      mLowestIframeProfile = mDesiredIframeProfile = iframeTrackInfo[0].idx;
       for (int cnt = 0; cnt <= iframeTrackIdx; cnt++) {
-        // if bandwidth matches , apply to both desired and lower ( for all speed of trick)
-        if(iframeTrackInfo[cnt].bandwidth == desiredProfileNonIframeBW) {
-          mDesiredIframeProfile = mLowestIframeProfile = cnt;
+        // find the track less than default bw set, apply to both desired and lower ( for all speed of trick)
+        if(iframeTrackInfo[cnt].bandwidth >= mDefaultIframeBitrate) {
           break;
         }
-      }
-      // if matching bandwidth not found with video , then pick the middle profile for iframe
-      if((!mDesiredIframeProfile) && (iframeTrackIdx >= 1)) {
-        mDesiredIframeProfile = (iframeTrackIdx/2) + (iframeTrackIdx%2);
-        mLowestIframeProfile = mDesiredIframeProfile;
+        mDesiredIframeProfile = iframeTrackInfo[cnt].idx;
       }
     } else {
-      //Keeping old logic for non 4K streams
-      for (int i = 0; i < getProfileCount(); i++) {
-        if (mProfiles[i].isIframeTrack) {
-          if (mLowestIframeProfile == INVALID_PROFILE) {
-            // first pick the lowest profile available
-            mLowestIframeProfile = i;
-            mDesiredIframeProfile = i;
-            continue;
+      if(is4K) {
+        // Get the default profile of 4k video , apply same bandwidth of video to iframe also
+        int desiredProfileIndexNonIframe = getProfileCount() / 2;
+        int desiredProfileNonIframeBW = mProfiles[desiredProfileIndexNonIframe].bandwidthBitsPerSecond ;
+        mDesiredIframeProfile = mLowestIframeProfile = 0;
+        for (int cnt = 0; cnt <= iframeTrackIdx; cnt++) {
+          // if bandwidth matches , apply to both desired and lower ( for all speed of trick)
+          if(iframeTrackInfo[cnt].bandwidth == desiredProfileNonIframeBW) {
+            mDesiredIframeProfile = mLowestIframeProfile = iframeTrackInfo[cnt].idx;
+            break;
           }
-          // if more profiles available , stored second best to desired profile
-          mDesiredIframeProfile = i;
-          break; // select first-advertised
+        }
+        // if matching bandwidth not found with video , then pick the middle profile for iframe
+        if((!mDesiredIframeProfile) && (iframeTrackIdx >= 1)) {
+          int desiredTrackIdx = (int) (iframeTrackIdx / 2) + (iframeTrackIdx % 2);
+          mDesiredIframeProfile = mLowestIframeProfile = iframeTrackInfo[desiredTrackIdx].idx;
+        }
+      } else {
+        //Keeping old logic for non 4K streams
+        for (int cnt = 0; cnt <= iframeTrackIdx; cnt++) {
+            if (mLowestIframeProfile == INVALID_PROFILE) {
+              // first pick the lowest profile available
+              mLowestIframeProfile = mDesiredIframeProfile = iframeTrackInfo[cnt].idx;
+              continue;
+            }
+            // if more profiles available , stored second best to desired profile
+            mDesiredIframeProfile = iframeTrackInfo[cnt].idx;
+            break; // select first-advertised
         }
       }
     }
@@ -617,4 +626,14 @@ void ABRManager::disableLogger() {
  */
 void ABRManager::setLogDirectory(char driveName) {
   gsLogDirectory[0] = driveName;
+}
+
+/**
+ * @brief Set the default iframe bitrate
+ * 
+ * @param defaultIframeBitrate Default iframe bitrate
+ */
+void ABRManager::setDefaultIframeBitrate(long defaultIframeBitrate)
+{
+  mDefaultIframeBitrate = defaultIframeBitrate;
 }

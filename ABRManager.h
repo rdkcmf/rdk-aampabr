@@ -203,6 +203,13 @@ public:
    */
   void setLogDirectory(char driveName);
 
+  /**
+   * @brief Set the default iframe bitrate
+   * 
+   * @param defaultIframeBitrate Default iframe bitrate
+   */
+  void setDefaultIframeBitrate(long defaultIframeBitrate);
+
 private:
   // Inner functions
 
@@ -262,6 +269,11 @@ private:
    * @brief Logger function pointer
    */
   static LoggerFuncType sLogger;
+
+  /**
+   * @brief Default iframe bitrate
+   */
+  long mDefaultIframeBitrate;
 
 public:
   /**
