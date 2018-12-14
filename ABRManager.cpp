@@ -544,7 +544,7 @@ int ABRManager::getMaxBandwidthProfile()
   // Ensure the mSortedBWProfileList is populated
   initializeSortedBWProfileList();
 
-  return mSortedBWProfileList.rbegin()->second;
+  return mSortedBWProfileList.size()?mSortedBWProfileList.rbegin()->second:0;
 }
 
 // Getters/Setters
