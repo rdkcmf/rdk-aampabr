@@ -300,13 +300,19 @@ int ABRManager::getBestMatchedProfileIndexByBandWidth(int bandwidth) {
   for (int i = 0; i < profileCount; i++) {
     const ProfileInfo& profile = mProfiles[i];
     if (!profile.isIframeTrack) {
-      if (profile.bandwidthBitsPerSecond == bandwidth) {
-        // Good case ,most manifest url will have same bandwidth in fragment file with configured profile bandwidth
-        desiredProfileIndex = i;
-      } else if (profile.bandwidthBitsPerSecond < bandwidth) {
-        // fragment file name bandwidth doesnt match the profile bandwidth, will be always less
-        desiredProfileIndex = (i + 1);
-      }
+        if (profile.bandwidthBitsPerSecond == bandwidth) {
+            // Good case ,most manifest url will have same bandwidth in fragment file with configured profile bandwidth
+            desiredProfileIndex = i;
+            break;
+        } else if (profile.bandwidthBitsPerSecond < bandwidth) {
+            // fragment file name bandwidth doesnt match the profile bandwidth, will be always less
+            if((i+1) == profileCount) {
+                desiredProfileIndex = i;
+                break;
+            }
+            else
+                desiredProfileIndex = (i + 1);
+        }
     }
   }
 #if defined(DEBUG_ENABLED)
