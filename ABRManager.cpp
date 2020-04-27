@@ -169,7 +169,7 @@ int ABRManager::getInitialProfileIndex(bool chooseMediumProfile) {
     SortedBWProfileListIter iter;
     desiredProfileIndex = mSortedBWProfileList.begin()->second;
     for (iter = mSortedBWProfileList.begin(); iter != mSortedBWProfileList.end(); ++iter) {
-      if (iter->first >= mDefaultInitBitrate) {
+      if (iter->first > mDefaultInitBitrate) {
         break;
       }
       // Choose the profile whose bitrate < default bitrate
