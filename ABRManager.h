@@ -53,6 +53,11 @@ public:
      * @brief Height of resolution (optional)
      */
     int height;
+
+    /**
+     * @brief period-Id of profiles (optional)
+     */
+    std::string periodId;
   };
 
   /**
@@ -73,10 +78,12 @@ public:
    * @param chooseMediumProfile Boolean flag, true means
    * to choose the medium profile, otherwise to choose the profile whose
    * bitrate >= the default bitrate.
+   * @param periodId empty string by default, Period-Id of the profiles
+   * added to ABR map
    * 
    * @return The initial profile index 
    */
-  int getInitialProfileIndex(bool chooseMediumProfile);
+  int getInitialProfileIndex(bool chooseMediumProfile, const std::string& periodId= std::string());
 
   /**
    * @brief Update the lowest / desired profile index
@@ -96,25 +103,31 @@ public:
    * @brief Ramp down the profile one step to get the profile index of a lower bitrate.
    *
    * @param currentProfileIndex The current profile index
+   * @param periodId empty string by default, Period-Id of profiles
+   *
    * @return the profile index of a lower bitrate (one step)
    */
-  int getRampedDownProfileIndex(int currentProfileIndex);
+  int getRampedDownProfileIndex(int currentProfileIndex, const std::string& periodId= std::string());
 
   /**
    * @brief Ramp up the profile one step to get the profile index of a upper bitrate.
    *
    * @param currentProfileIndex The current profile index
+   * @param periodId empty string by default, Period-Id of profiles
+   *
    * @return the profile index of a upper bitrate (one step)
    */
-  int getRampedUpProfileIndex(int currentProfileIndex);
+  int getRampedUpProfileIndex(int currentProfileIndex, const std::string& periodId= std::string());
 
   /**
    * @brief Check if the bitrate of currentProfileIndex reaches to the lowest.
    *
    * @param currentProfileIndex The current profile index
+   * @param periodId empty string by default, Period-Id of profiles
+   *
    * @return True means it reaches to the lowest, otherwise, it doesn't.
    */
-  bool isProfileIndexBitrateLowest(int currentProfileIndex);
+  bool isProfileIndexBitrateLowest(int currentProfileIndex, const std::string& periodId= std::string());
 
   /**
    * @brief Do ABR by ramping bitrate up/down according to the current
@@ -124,10 +137,11 @@ public:
    * @param currentProfileIndex The current profile index
    * @param currentBandwidth The current band width
    * @param networkBandwidth The current available bandwidth (network bandwidth)
-   * @param nwConsistencyCnt Network consistency count, used for bitrate ramping up/down 
+   * @param nwConsistencyCnt Network consistency count, used for bitrate ramping up/down
+   * @param periodId empty string by default, Period-Id of profiles
    * @return int Profile index
    */
-  int getProfileIndexByBitrateRampUpOrDown(int currentProfileIndex, long currentBandwidth, long networkBandwidth, int nwConsistencyCnt = DEFAULT_ABR_NW_CONSISTENCY_COUNT);
+  int getProfileIndexByBitrateRampUpOrDown(int currentProfileIndex, long currentBandwidth, long networkBandwidth, int nwConsistencyCnt = DEFAULT_ABR_NW_CONSISTENCY_COUNT, const std::string& periodId= std::string());
 
   /**
    * @brief Get bandwidth of profile
@@ -148,9 +162,11 @@ public:
   /**
    * @brief Get the index of max bandwidth
    * 
+   * @param periodId empty string by default, Period-Id of profiles
+   *
    * @return int index of the max bandwidth
    */
-  int getMaxBandwidthProfile();
+  int getMaxBandwidthProfile(const std::string& periodId = std::string());
 public:
   // Getters/Setters
   /**
@@ -233,10 +249,10 @@ private:
   std::vector<ProfileInfo> mProfiles;
 
   /**
-   * @brief A sorted list of profiles.
-   * Populate the container with sorted order of BW (Bandwidth) vs its index
+   * @brief A sorted list of profiles with periodId.
+   * Populate the container with sorted order of BW (Bandwidth) vs its index under each periodId
    */
-  std::map<long, int> mSortedBWProfileList;
+  std::map<std::string, std::map<long,int>> mSortedBWProfileList;
 
   /**
    * @brief Define type: iterator of SortedBWProfileListIter 
