@@ -418,6 +418,26 @@ int ABRManager::getRampedUpProfileIndex(int currentProfileIndex, const std::stri
 }
 
 
+/**
+* @brief Get UserData of profile
+* 
+* @param profileIndex The profile index
+* @return int userdata / period index
+*/
+int ABRManager::getUserDataOfProfile(int currentProfileIndex)
+{
+	int userData = -1;
+	int profileCount = getProfileCount();
+	if (profileCount == 0 || currentProfileIndex >= profileCount) {
+		sLogger("%s:%d No profiles/input profile %d more than profileCount %d\n",
+		__FUNCTION__, __LINE__, currentProfileIndex, profileCount);
+	}
+	else
+	{
+		userData = mProfiles[currentProfileIndex].userData;
+	}
+	return userData;
+}
 
 
 /**
