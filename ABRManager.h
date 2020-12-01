@@ -53,6 +53,16 @@ public:
      * @brief Height of resolution (optional)
      */
     int height;
+
+    /**
+     * @brief period-Id of profiles (optional)
+     */
+    std::string periodId;
+
+    /**
+     * @brief profileIndex or PeriodIndex (optional)
+     */
+    int userData;
   };
 
   /**
@@ -131,7 +141,7 @@ public:
 
   /**
    * @brief Get bandwidth of profile
-   * 
+   *
    * @param profileIndex The profile index
    * @return long bandwidth of the profile
    */
@@ -217,6 +227,13 @@ public:
    * @param defaultIframeBitrate Default iframe bitrate
    */
   void setDefaultIframeBitrate(long defaultIframeBitrate);
+   /**
+    * @brief Get UserData of profile
+    *
+    * @param profileIndex The profile index
+    * @return int userdata / period index
+    */
+   int getUserDataOfProfile(int profileIndex);
 
 private:
   // Inner functions
