@@ -19,7 +19,9 @@
 
 #include <vector>
 #include <map>
+#include <string>
 #include <cstdio>
+
 
 /**
  * @brief ABR Manager for HLS/DASH
