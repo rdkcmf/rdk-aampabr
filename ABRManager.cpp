@@ -126,30 +126,6 @@ ABRManager::ABRManager() :
 }
 
 /**
- * @brief Initialize mSortedBWProfileList
- */
-void ABRManager::initializeSortedBWProfileList() {
-  if (!mSortedBWProfileList.size()) {
-    int profileCount = getProfileCount();
-    for (int cnt = 0; cnt < profileCount; cnt++) {
-      // store all the bandwidth data and its index to map which will sort by itself
-      if (!mProfiles[cnt].isIframeTrack) {
-        mSortedBWProfileList[mProfiles[cnt].periodId][mProfiles[cnt].bandwidthBitsPerSecond] = cnt;
-      }
-    }
-#if defined(DEBUG_ENABLED)
-    for(auto iter1 : mSortedBWProfileList) {
-      sLogger("%s: Period ID: %s\n", __FUNCTION__, iter1.first.c_str());
-      for(auto iter2 : iter1.second) {
-        sLogger("%s: bw:%ld idx:%d\n", __FUNCTION__, iter2.first, iter2.second);
-      }
-    }
-#endif
-
-  }
-}
-
-/**
  * @brief Get initial profile index, choose the medium profile or
  * the profile whose bitrate >= the default bitrate.
  * 
@@ -161,13 +137,7 @@ void ABRManager::initializeSortedBWProfileList() {
  * @return The initial profile index 
  */
 int ABRManager::getInitialProfileIndex(bool chooseMediumProfile, const std::string& periodId) {
-  // This function will be called only once during session creation to get default profile
-  // check if any profiles are added (incase), remove it before adding fresh
-  // populate the container with sorted order of BW vs its index
-  if (mSortedBWProfileList.size()) {
-    mSortedBWProfileList.erase(mSortedBWProfileList.begin(),mSortedBWProfileList.end());
-  }	
-  initializeSortedBWProfileList();
+  
   int profileCount = getProfileCount();
   int desiredProfileIndex = INVALID_PROFILE;
   if (chooseMediumProfile && profileCount > 1) {
@@ -500,9 +470,6 @@ int ABRManager::getProfileIndexByBitrateRampUpOrDown(int currentProfileIndex, lo
     mAbrProfileChangeDownCount = 0;
     return desiredProfileIndex;
   }
-  // Ensure the mSortedBWProfileList is populated
-  initializeSortedBWProfileList();
-  // regular scenario where cache is not empty
   if(networkBandwidth > currentBandwidth) {
     // if networkBandwidth > is more than current bandwidth
     SortedBWProfileListIter iter;
@@ -625,8 +592,6 @@ int ABRManager::getMaxBandwidthProfile(const std::string& periodId)
       __FUNCTION__, __LINE__);
     return 0;
   }
-  // Ensure the mSortedBWProfileList is populated
-  initializeSortedBWProfileList();
 
   return mSortedBWProfileList[periodId].size()?mSortedBWProfileList[periodId].rbegin()->second:0;
 }
@@ -674,6 +639,14 @@ int ABRManager::getDesiredIframeProfile() const {
  */
 void ABRManager::addProfile(ABRManager::ProfileInfo profile) {
   mProfiles.push_back(profile);
+  int profileCount = getProfileCount();
+  if (!mProfiles[profileCount-1].isIframeTrack) {
+	mSortedBWProfileList[mProfiles[profileCount-1].periodId][mProfiles[profileCount-1].bandwidthBitsPerSecond] = profileCount - 1;
+#if defined(DEBUG_ENABLED)
+	sLogger("%s: Period ID: %s\n", __FUNCTION__, mProfiles[profileCount-1].periodId.c_str());
+	sLogger("%s: bw:%ld idx:%d\n", __FUNCTION__, mProfiles[profileCount-1].bandwidthBitsPerSecond, profileCount-1);
+#endif
+  }
 }
 
 /**
@@ -683,6 +656,7 @@ void ABRManager::clearProfiles() {
   mProfiles.clear();
   if (mSortedBWProfileList.size()) {
     mSortedBWProfileList.erase(mSortedBWProfileList.begin(),mSortedBWProfileList.end());
+    mSortedBWProfileList.clear();
   }	
 }
 
