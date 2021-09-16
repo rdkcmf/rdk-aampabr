@@ -126,30 +126,6 @@ ABRManager::ABRManager() :
 }
 
 /**
- * @brief Initialize mSortedBWProfileList
- */
-void ABRManager::initializeSortedBWProfileList() {
-  if (!mSortedBWProfileList.size()) {
-    int profileCount = getProfileCount();
-    for (int cnt = 0; cnt < profileCount; cnt++) {
-      // store all the bandwidth data and its index to map which will sort by itself
-      if (!mProfiles[cnt].isIframeTrack) {
-        mSortedBWProfileList[mProfiles[cnt].periodId][mProfiles[cnt].bandwidthBitsPerSecond] = cnt;
-      }
-    }
-#if defined(DEBUG_ENABLED)
-    for(auto iter1 : mSortedBWProfileList) {
-      sLogger("%s: Period ID: %s\n", __FUNCTION__, iter1.first.c_str());
-      for(auto iter2 : iter1.second) {
-        sLogger("%s: bw:%ld idx:%d\n", __FUNCTION__, iter2.first, iter2.second);
-      }
-    }
-#endif
-
-  }
-}
-
-/**
  * @brief Get initial profile index, choose the medium profile or
  * the profile whose bitrate >= the default bitrate.
  * 
@@ -663,11 +639,17 @@ int ABRManager::getDesiredIframeProfile() const {
  */
 void ABRManager::addProfile(ABRManager::ProfileInfo profile) {
   mProfiles.push_back(profile);
-  if (mSortedBWProfileList.size()) {
-    mSortedBWProfileList.erase(mSortedBWProfileList.begin(),mSortedBWProfileList.end());
-    mSortedBWProfileList.clear();
-  }
-  initializeSortedBWProfileList();
+  int profileCount = getProfileCount();
+  if (profileCount > 0)
+  {
+	if (!mProfiles[profileCount-1].isIframeTrack) {
+  		mSortedBWProfileList[mProfiles[profileCount-1].periodId][mProfiles[profileCount-1].bandwidthBitsPerSecond] = profileCount - 1;
+#if defined(DEBUG_ENABLED)
+		sLogger("%s: Period ID: %s\n", __FUNCTION__, mProfiles[profileCount-1].periodId.c_str());
+		sLogger("%s: bw:%ld idx:%d\n", __FUNCTION__, mProfiles[profileCount-1].bandwidthBitsPerSecond, profileCount-1);
+#endif
+	}
+   }
 }
 
 /**
@@ -677,6 +659,7 @@ void ABRManager::clearProfiles() {
   mProfiles.clear();
   if (mSortedBWProfileList.size()) {
     mSortedBWProfileList.erase(mSortedBWProfileList.begin(),mSortedBWProfileList.end());
+    mSortedBWProfileList.clear();
   }	
 }
 

@@ -249,14 +249,6 @@ public:
    int getUserDataOfProfile(int profileIndex);
 
 private:
-  // Inner functions
-
-  /**
-   * @brief Initialize mSortedBWProfileList
-   */
-  void initializeSortedBWProfileList();
-
-private:
   /**
    * @brief A list of available profiles.
    */
