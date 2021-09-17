@@ -640,16 +640,13 @@ int ABRManager::getDesiredIframeProfile() const {
 void ABRManager::addProfile(ABRManager::ProfileInfo profile) {
   mProfiles.push_back(profile);
   int profileCount = getProfileCount();
-  if (profileCount > 0)
-  {
-	if (!mProfiles[profileCount-1].isIframeTrack) {
-  		mSortedBWProfileList[mProfiles[profileCount-1].periodId][mProfiles[profileCount-1].bandwidthBitsPerSecond] = profileCount - 1;
+  if (!mProfiles[profileCount-1].isIframeTrack) {
+	mSortedBWProfileList[mProfiles[profileCount-1].periodId][mProfiles[profileCount-1].bandwidthBitsPerSecond] = profileCount - 1;
 #if defined(DEBUG_ENABLED)
-		sLogger("%s: Period ID: %s\n", __FUNCTION__, mProfiles[profileCount-1].periodId.c_str());
-		sLogger("%s: bw:%ld idx:%d\n", __FUNCTION__, mProfiles[profileCount-1].bandwidthBitsPerSecond, profileCount-1);
+	sLogger("%s: Period ID: %s\n", __FUNCTION__, mProfiles[profileCount-1].periodId.c_str());
+	sLogger("%s: bw:%ld idx:%d\n", __FUNCTION__, mProfiles[profileCount-1].bandwidthBitsPerSecond, profileCount-1);
 #endif
-	}
-   }
+  }
 }
 
 /**
