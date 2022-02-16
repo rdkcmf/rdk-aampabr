@@ -522,7 +522,7 @@ int ABRManager::getProfileIndexByBitrateRampUpOrDown(int currentProfileIndex, lo
     // we didn't find a profile which can be supported in this bandwidth
     if (reviter == mSortedBWProfileList[periodId].rend()) {
 	desiredProfileIndex = mSortedBWProfileList[periodId].begin()->second;
-        sLogger("%s:%d Didn't find a profile which supports bandwidth[%ld], min bandwidth available [%ld]. Set profile to lowest!\n", __FUNCTION__, __LINE__, networkBandwidth, mSortedBWProfileList.begin()->first);
+        sLogger("%s:%d Didn't find a profile which supports bandwidth[%ld], min bandwidth available [%ld]. Set profile to lowest!\n", __FUNCTION__, __LINE__, networkBandwidth, mSortedBWProfileList[periodId].begin()->first);
     }
 
     // No need to jump one profile for small  network change
