@@ -17,6 +17,14 @@
 #ifndef ABR_MANAGER_H
 #define ABR_MANAGER_H
 
+/**********************************************************************
+ *
+ * @file ABRManager.h
+ * @brief Handles operations for ABR for HLS/DASH
+ *
+ *********************************************************************/
+
+
 #include <vector>
 #include <map>
 #include <string>
@@ -24,6 +32,7 @@
 
 
 /**
+ * @class ABRManager
  * @brief ABR Manager for HLS/DASH
  * 
  * It returns the profile index with the desired bitrate

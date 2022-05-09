@@ -14,6 +14,13 @@
  *   limitations under the License.
 */
 
+/*******************************************************************
+ *
+ * @file ABRManager.cpp
+ * @brief Handles operations on aamp abr
+ *
+ ******************************************************************/
+
 #include "ABRManager.h"
 #include <cstdio>
 #include <cstdarg>
@@ -108,13 +115,11 @@ static int defaultLogger(const char* fmt, ...) {
 }
 
 /**
- * Initialize the logger to printf
+ * @brief Initialize the logger to printf
  */
 ABRManager::LoggerFuncType ABRManager::sLogger = defaultLogger;
 
-/**
- * @brief Constructor of ABRManager
- */
+
 ABRManager::ABRManager() : 
   mDefaultInitBitrate(DEFAULT_BITRATE),
   mDesiredIframeProfile(0),
@@ -125,17 +130,8 @@ ABRManager::ABRManager() :
 
 }
 
-/**
- * @brief Get initial profile index, choose the medium profile or
- * the profile whose bitrate >= the default bitrate.
- * 
- * @param chooseMediumProfile Boolean flag, true means
- * to choose the medium profile, otherwise to choose the profile whose
- * bitrate >= the default bitrate.
- * @param periodId empty string by default, Period-Id of profiles
- * 
- * @return The initial profile index 
- */
+
+
 int ABRManager::getInitialProfileIndex(bool chooseMediumProfile, const std::string& periodId) {
   
   int profileCount = getProfileCount();
@@ -167,10 +163,7 @@ int ABRManager::getInitialProfileIndex(bool chooseMediumProfile, const std::stri
   return desiredProfileIndex;
 }
 
-/**
- * @brief Update the lowest / desired profile index
- *    by the profile info. 
- */
+
 void ABRManager::updateProfile() {
   /**
    * @brief A temporary structure of iframe track info
@@ -265,12 +258,7 @@ void ABRManager::updateProfile() {
 #endif
 }
 
-/**
- * @brief According to the given bandwidth, return the best matched
- * profile index.
- * @param bandWidth  The given bandwidth
- * @return the best matched profile index
- */
+
 int ABRManager::getBestMatchedProfileIndexByBandWidth(int bandwidth) {
   // a) Check if network bandwidth changed from starting bandwidth
   // b) Check if netwwork bandwidth is different from persisted bandwidth( needed for first time reporting)
@@ -303,14 +291,7 @@ int ABRManager::getBestMatchedProfileIndexByBandWidth(int bandwidth) {
   return desiredProfileIndex;
 }
 
-/**
- * @brief Ramp down the profile one step to get the profile index of a lower bitrate.
- *
- * @param currentProfileIndex The current profile index
- * @param periodId empty string by default, Period-Id of profiles
- *
- * @return the profile index of a lower bitrate (one step)
- */
+
 int ABRManager::getRampedDownProfileIndex(int currentProfileIndex, const std::string& periodId) {
   // Clamp the param to avoid overflow
   int profileCount = getProfileCount();
@@ -348,13 +329,7 @@ int ABRManager::getRampedDownProfileIndex(int currentProfileIndex, const std::st
   return desiredProfileIndex;
 }
 
-/**
- * @brief Ramp Up the profile one step to get the profile index of a upper bitrate.
- *
- * @param currentProfileIndex The current profile index
- * @param periodId empty string by default, Period-Id of profiles
- * @return the profile index of a upper bitrate (one step)
- */
+
 int ABRManager::getRampedUpProfileIndex(int currentProfileIndex, const std::string& periodId) {
   // Clamp the param to avoid overflow
   int profileCount = getProfileCount();
@@ -388,12 +363,6 @@ int ABRManager::getRampedUpProfileIndex(int currentProfileIndex, const std::stri
 }
 
 
-/**
-* @brief Get UserData of profile
-* 
-* @param profileIndex The profile index
-* @return int userdata / period index
-*/
 int ABRManager::getUserDataOfProfile(int currentProfileIndex)
 {
 	int userData = -1;
@@ -410,13 +379,6 @@ int ABRManager::getUserDataOfProfile(int currentProfileIndex)
 }
 
 
-/**
- * @brief Check if the bitrate of currentProfileIndex reaches to the lowest.
- *
- * @param currentProfileIndex The current profile index
- * @param periodId empty string by default, Period-Id of profiles
- * @return True means it reaches to the lowest, otherwise, it doesn't.
- */
 bool ABRManager::isProfileIndexBitrateLowest(int currentProfileIndex, const std::string& periodId) {
   // Clamp the param to avoid overflow
   int profileCount = getProfileCount();
@@ -439,18 +401,7 @@ bool ABRManager::isProfileIndexBitrateLowest(int currentProfileIndex, const std:
   return iter == mSortedBWProfileList[periodId].begin();
 }
 
-/**
- * @brief Do ABR by ramping bitrate up/down according to the current
- * network status. Returns the profile index with the bitrate matched with
- * the current bitrate.
- * 
- * @param currentProfileIndex The current profile index
- * @param currentBandwidth The current band width
- * @param networkBandwidth The current available bandwidth (network bandwidth)
- * @param nwConsistencyCnt Network consistency count, used for bitrate ramping up/down
- * @param periodId empty string by default, Period-Id of profiles
- * @return int Profile index
- */
+
 int ABRManager::getProfileIndexByBitrateRampUpOrDown(int currentProfileIndex, long currentBandwidth, long networkBandwidth, int nwConsistencyCnt, const std::string& periodId) {
   // Clamp the param to avoid overflow
   int profileCount = getProfileCount();
@@ -554,12 +505,7 @@ int ABRManager::getProfileIndexByBitrateRampUpOrDown(int currentProfileIndex, lo
   return desiredProfileIndex;
 }
 
-/**
- * @brief Get bandwidth of profile
- * 
- * @param profileIndex The profile index
- * @return long bandwidth of the profile
- */
+
 long ABRManager::getBandwidthOfProfile(int profileIndex) {
   // Clamp the param to avoid overflow
   int profileCount = getProfileCount();
@@ -577,13 +523,7 @@ long ABRManager::getBandwidthOfProfile(int profileIndex) {
   return mProfiles[profileIndex].bandwidthBitsPerSecond;
 }
 
-/**
- * @brief Get the index of max bandwidth
- * 
- * @param periodId empty string by default, Period-Id of profiles
- *
- * @return int index of the max bandwidth
- */
+
 int ABRManager::getMaxBandwidthProfile(const std::string& periodId)
 {
   int profileCount = getProfileCount();
@@ -596,47 +536,27 @@ int ABRManager::getMaxBandwidthProfile(const std::string& periodId)
   return mSortedBWProfileList[periodId].size()?mSortedBWProfileList[periodId].rbegin()->second:0;
 }
 
-// Getters/Setters
-/**
- * @brief Get the number of profiles
- * 
- * @return The number of profiles 
- */
+
 int ABRManager::getProfileCount() const {
   return static_cast<int>(mProfiles.size());
 }
 
-/**
- * @brief Set the default init bitrate
- * 
- * @param defaultInitBitrate Default init bitrate
- */
+
 void ABRManager::setDefaultInitBitrate(long defaultInitBitrate) {
   mDefaultInitBitrate = defaultInitBitrate;
 }
 
-/**
- * @brief Get the lowest iframe profile index.
- * 
- * @return the lowest iframe profile index. 
- */
+
 int ABRManager::getLowestIframeProfile() const {
   return mLowestIframeProfile;
 }
 
-/**
- * @brief Get the desired iframe profile index.
- * 
- * @return the desired iframe profile index. 
- */
+
 int ABRManager::getDesiredIframeProfile() const {
   return mDesiredIframeProfile;
 }
 
-/**
- * @brief Add new profile info into the manager
- * @param profile The profile info
- */
+
 void ABRManager::addProfile(ABRManager::ProfileInfo profile) {
   mProfiles.push_back(profile);
   int profileCount = getProfileCount();
@@ -649,9 +569,7 @@ void ABRManager::addProfile(ABRManager::ProfileInfo profile) {
   }
 }
 
-/**
- * @brief Clear profiles
- */
+
 void ABRManager::clearProfiles() {
   mProfiles.clear();
   if (mSortedBWProfileList.size()) {
@@ -660,37 +578,23 @@ void ABRManager::clearProfiles() {
   }	
 }
 
-/**
- * @brief Set logger function
- * 
- * The logger function must be in the signature int (const char*, ...)
- * 
- * @param logger The logger function
- */
+
 void ABRManager::setLogger(LoggerFuncType logger) {
   sLogger = logger;
 }
 
-/**
- * @brief Disable logger, then no logger output.
- */
+
 void ABRManager::disableLogger() {
   // Set the empty logger
   sLogger = emptyLogger;
 }
 
-/**
- * @brief Set the simulator log file directory index.
- */
+
 void ABRManager::setLogDirectory(char driveName) {
   gsLogDirectory[0] = driveName;
 }
 
-/**
- * @brief Set the default iframe bitrate
- * 
- * @param defaultIframeBitrate Default iframe bitrate
- */
+
 void ABRManager::setDefaultIframeBitrate(long defaultIframeBitrate)
 {
   mDefaultIframeBitrate = defaultIframeBitrate;
