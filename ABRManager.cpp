@@ -112,6 +112,8 @@ static int defaultLogger(const char* fmt, ...) {
  */
 ABRManager::LoggerFuncType ABRManager::sLogger = defaultLogger;
 
+long ABRManager::mPersistBandwidth = 0;
+long long ABRManager::mPersistBandwidthUpdatedTime = 0;
 /**
  * @brief Constructor of ABRManager
  */
@@ -614,6 +616,7 @@ int ABRManager::getProfileCount() const {
 void ABRManager::setDefaultInitBitrate(long defaultInitBitrate) {
   mDefaultInitBitrate = defaultInitBitrate;
 }
+
 
 /**
  * @brief Get the lowest iframe profile index.

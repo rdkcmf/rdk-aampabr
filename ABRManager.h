@@ -72,6 +72,16 @@ public:
    */
   typedef int (*LoggerFuncType)(const char* fmt, ...);
 
+  /**
+   * @brief Persist Network Bandwidth 
+   */
+  static long mPersistBandwidth;
+
+  /**
+   * @brief Persist Network Bandwidth Updated Time
+   */
+
+  static long long mPersistBandwidthUpdatedTime;
 public:
   /**
    * @brief Constructor of ABRManager
@@ -247,7 +257,18 @@ public:
     * @return int userdata / period index
     */
    int getUserDataOfProfile(int profileIndex);
-
+   /**
+    * @brief Set the Persist Network Bandwidth
+    *
+    * @param network bitrate
+    */
+   static void setPersistBandwidth(long bitrate){mPersistBandwidth = bitrate;}
+   /**
+    * @brief Get Persisted Network Bandwidth
+    *
+    * @return  bandwidth
+    */
+   static long getPersistBandwidth() { return mPersistBandwidth;}
 private:
   /**
    * @brief A list of available profiles.
@@ -284,6 +305,7 @@ private:
    * @brief Default initialization bitrate
    */
   long mDefaultInitBitrate;
+
 
   /**
    * @brief The number of ABR profiles that ramping up
