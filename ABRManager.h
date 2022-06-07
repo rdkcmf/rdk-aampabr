@@ -14,6 +14,11 @@
  *   limitations under the License.
 */
 
+/***************************************************
+ * @file ABRManager.h
+ * @brief Handles operations on ABR functionalities
+ ***************************************************/
+
 #ifndef ABR_MANAGER_H
 #define ABR_MANAGER_H
 
@@ -24,6 +29,7 @@
 
 
 /**
+ * @class ABRManager
  * @brief ABR Manager for HLS/DASH
  * 
  * It returns the profile index with the desired bitrate
@@ -74,13 +80,12 @@ public:
 
 public:
   /**
-   * @brief Constructor of ABRManager
+   * @fn ABRManager
    */
   ABRManager();
 
   /**
-   * @brief Get initial profile index, choose the medium profile or
-   * the profile whose bitrate >= the default bitrate.
+   * @fn getInitialProfileIndex
    * 
    * @param chooseMediumProfile Boolean flag, true means
    * to choose the medium profile, otherwise to choose the profile whose
@@ -93,21 +98,20 @@ public:
   int getInitialProfileIndex(bool chooseMediumProfile, const std::string& periodId= std::string());
 
   /**
-   * @brief Update the lowest / desired profile index
-   *    by the profile info. 
+   * @fn updateProfile
+   * @return void
    */
   void updateProfile();
 
   /**
-   * @brief According to the given bandwidth, return the best matched
-   * profile index.
+   * @fn getBestMatchedProfileIndexByBandWidth
    * @param bandWidth  The given bandwidth
    * @return the best matched profile index
    */
   int getBestMatchedProfileIndexByBandWidth(int bandwidth);
 
   /**
-   * @brief Ramp down the profile one step to get the profile index of a lower bitrate.
+   * @fn getRampedDownProfileIndex
    *
    * @param currentProfileIndex The current profile index
    * @param periodId empty string by default, Period-Id of profiles
@@ -117,7 +121,7 @@ public:
   int getRampedDownProfileIndex(int currentProfileIndex, const std::string& periodId= std::string());
 
   /**
-   * @brief Ramp up the profile one step to get the profile index of a upper bitrate.
+   * @fn getRampedUpProfileIndex
    *
    * @param currentProfileIndex The current profile index
    * @param periodId empty string by default, Period-Id of profiles
@@ -127,7 +131,7 @@ public:
   int getRampedUpProfileIndex(int currentProfileIndex, const std::string& periodId= std::string());
 
   /**
-   * @brief Check if the bitrate of currentProfileIndex reaches to the lowest.
+   * @fn isProfileIndexBitrateLowest
    *
    * @param currentProfileIndex The current profile index
    * @param periodId empty string by default, Period-Id of profiles
@@ -137,9 +141,7 @@ public:
   bool isProfileIndexBitrateLowest(int currentProfileIndex, const std::string& periodId= std::string());
 
   /**
-   * @brief Do ABR by ramping bitrate up/down according to the current
-   * network status. Returns the profile index with the bitrate matched with
-   * the current bitrate.
+   * @fn getProfileIndexByBitrateRampUpOrDown
    * 
    * @param currentProfileIndex The current profile index
    * @param currentBandwidth The current band width
@@ -151,7 +153,7 @@ public:
   int getProfileIndexByBitrateRampUpOrDown(int currentProfileIndex, long currentBandwidth, long networkBandwidth, int nwConsistencyCnt = DEFAULT_ABR_NW_CONSISTENCY_COUNT, const std::string& periodId= std::string());
 
   /**
-   * @brief Get bandwidth of profile
+   * @fn getBandwidthOfProfile
    *
    * @param profileIndex The profile index
    * @return long bandwidth of the profile
@@ -167,7 +169,7 @@ public:
   int getProfileOfBandwidth(long bandwidth);
 
   /**
-   * @brief Get the index of max bandwidth
+   * @fn getMaxBandwidthProfile
    * 
    * @param periodId empty string by default, Period-Id of profiles
    *
@@ -177,71 +179,70 @@ public:
 public:
   // Getters/Setters
   /**
-   * @brief Get the number of profiles
+   * @fn getProfileCount
    * 
    * @return The number of profiles 
    */
   int getProfileCount() const;
 
   /**
-   * @brief Set the default init bitrate
+   * @fn setDefaultInitBitrate
    * 
    * @param defaultInitBitrate Default init bitrate
    */
   void setDefaultInitBitrate(long defaultInitBitrate);
 
   /**
-   * @brief Get the lowest iframe profile index.
+   * @fn getLowestIframeProfile
    * 
    * @return the lowest iframe profile index. 
    */
   int getLowestIframeProfile() const;
 
   /**
-   * @brief Get the desired iframe profile index.
+   * @fn getDesiredIframeProfile
    * 
    * @return the desired iframe profile index. 
    */
   int getDesiredIframeProfile() const;
 
   /**
-   * @brief Add new profile info into the manager
+   * @fn addProfile
    * @param profile The profile info
    */
   void addProfile(ProfileInfo profile);
 
   /**
-   * @brief Clear profiles
+   * @fn clearProfiles
+   * @return void
    */
   void clearProfiles();
 
   /**
-   * @brief Set logger function
-   * 
-   * The logger function must be in the signature int (const char*, ...)
+   * @fn setLogger
    * 
    * @param logger The logger function
    */
   static void setLogger(LoggerFuncType logger);
 
   /**
-   * @brief Disable logger, then no logger output.
+   * @fn disableLogger
    */
   static void disableLogger();
 
   /**
-   * @brief Configure the simulator log file directory.
+   * @fn setLogDirectory
    */
   void setLogDirectory(char driveName);
 
   /**
-   * @brief Set the default iframe bitrate
+   * @fn setDefaultIframeBitrate
    * 
    * @param defaultIframeBitrate Default iframe bitrate
    */
   void setDefaultIframeBitrate(long defaultIframeBitrate);
    /**
-    * @brief Get UserData of profile
+    * @fn getUserDataOfProfile
     *
     * @param profileIndex The profile index
     * @return int userdata / period index
