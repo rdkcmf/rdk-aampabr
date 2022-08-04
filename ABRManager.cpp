@@ -567,7 +567,7 @@ int ABRManager::getProfileIndexByBitrateRampUpOrDown(int currentProfileIndex, lo
   }
 
   if (currentProfileIndex != desiredProfileIndex) {
-    sLogger("%s:%d Current bandwidth[%ld] Network bandwidth[%ld] Current profile index[%d] Desired profile index[%d] Period ID[%s]\n",
+    sLogger("%s:%d currBW:%ld NwBW=%ld currProf:%d desiredProf:%d Period ID:%s\n",
       __FUNCTION__, __LINE__, currentBandwidth, networkBandwidth,
       currentProfileIndex, desiredProfileIndex, periodId.c_str());
   }
