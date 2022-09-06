@@ -610,6 +610,45 @@ void ABRManager::addProfile(ABRManager::ProfileInfo profile) {
 }
 
 /**
+* @fn removeProfiles
+* @param[in] vector of profile bitrates to remove from ABR data
+* @param[in] currentProfileIndex
+* @param[in] period Id empty string by default, Period-Id of profiles
+* @return modified profileIndex
+*/
+int ABRManager::removeProfiles(std::vector<long> profileBPS, int currentProfileIndex, const std::string& periodId)
+{
+	int modifiedProfileIndex = INVALID_PROFILE;
+	std::vector<ProfileInfo> profiles = mProfiles;
+	long currentBandwidth = mProfiles[currentProfileIndex].bandwidthBitsPerSecond;
+	for(auto &profilesIter : profileBPS)
+	{
+		for(std::vector<ProfileInfo>::iterator iter = profiles.begin(); iter != profiles.end();)
+		{
+			if(iter->periodId == periodId && profilesIter ==  iter->bandwidthBitsPerSecond)
+			{
+				iter = profiles.erase(iter);
+			}
+			else
+			{
+				iter++;
+			}
+		}
+
+	}
+	clearProfiles();
+	for(auto &profile: profiles)
+	{
+		addProfile(profile);
+		if(currentBandwidth == profile.bandwidthBitsPerSecond)
+		{
+			 modifiedProfileIndex= getProfileCount() - 1;
+		}
+	}
+	return modifiedProfileIndex;
+}
+
+/**
  *  @brief Clear profiles
  */
 void ABRManager::clearProfiles() {

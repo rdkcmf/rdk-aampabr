@@ -229,6 +229,15 @@ public:
   void clearProfiles();
 
   /**
+   * @fn removeProfiles
+   * @param[in]  vector of profile bitrates to remove from ABR data
+   * @param[in] currentProfileIndex
+   * @param[in]  period Id empty string by default, Period-Id of profiles
+   * @return modified ProfileIndex
+   */
+  int removeProfiles(std::vector<long> profileBPS, int currentProfileIndex, const std::string& periodId = std::string());
+
+  /**
    * @fn setLogger
    * 
    * @param logger The logger function
