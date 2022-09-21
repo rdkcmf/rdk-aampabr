@@ -17,7 +17,8 @@
 cmake_minimum_required (VERSION 2.8)
 project (ABRManager)
 
-set(LIB_SOURCES ABRManager.cpp)
+set(LIB_SOURCES ABRManager.cpp
+		HybridABRManager.cpp)
 
 add_library(abr SHARED ${LIB_SOURCES})
 
@@ -35,5 +36,5 @@ if(CMAKE_SOC_PLATFORM_INTEL)
 	target_link_libraries(abr "-lsysloghelper")
 endif()
 
-set_target_properties(abr PROPERTIES PUBLIC_HEADER "ABRManager.h")
+set_target_properties(abr PROPERTIES PUBLIC_HEADER "ABRManager.h;HybridABRManager.h")
 install(TARGETS abr DESTINATION lib PUBLIC_HEADER DESTINATION include)

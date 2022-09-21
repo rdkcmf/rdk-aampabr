@@ -270,6 +270,10 @@ public:
     * @return  bandwidth
     */
    static long getPersistBandwidth() { return mPersistBandwidth;}
+
+
+   static LoggerFuncType logprintf;
+
 private:
   /**
    * @brief A list of available profiles.
@@ -357,5 +361,5 @@ private:
    */
   static const int DEFAULT_ABR_NW_CONSISTENCY_COUNT = 2;
 };
-
+extern void ABRLogger(const char* levelstr,const char* file, int line,const char* fmt, ...);
 #endif

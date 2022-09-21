@@ -75,15 +75,53 @@ static int emptyLogger(const char* fmt, ...) {
  * 
  * @return Number of printed characters 
  */
-static int defaultLogger(const char* fmt, ...) {
-  int ret = 0;
+static int defaultLogger(const char* fmt, ...) 
+{
+	int ret = 0;
+	char logBuf[MAX_LOG_BUFF_SIZE] = {0};
+
+	strcpy(logBuf, moduleName);
+	va_list args;
+	va_start(args, fmt);
+	ret = vsnprintf(logBuf + MODULE_NAME_SIZE, (MAX_LOG_BUFF_SIZE - 1 - MODULE_NAME_SIZE), fmt, args);
+	va_end(args);
+
+#if defined(ENABLE_RDK_LOGGER)
+#if defined(USE_SYSTEMD_JOURNAL_PRINT)
+	sd_journal_print(LOG_NOTICE, "%s\n", logBuf);
+#elif defined(USE_SYSLOG_HELPER_PRINT)
+	send_logs_to_syslog(logBuf);
+#endif
+	return ret;
+#else // ENABLE_RDK_LOGGER
+#ifdef WIN32
+	static bool init;
+	FILE *f = fopen(gsLogDirectory, (init ? "a" : "w"));
+	if (f)
+	{
+		init = true;
+		fprintf(f, "%s", logBuf);
+		fclose(f);
+	}
+	return printf("%s", logBuf);
+#else
+	struct timeval t;
+	gettimeofday(&t, NULL);
+	return printf("%ld:%3ld : %s\n", (long int)t.tv_sec, (long int)t.tv_usec / 1000, logBuf);
+#endif
+#endif
+}
+
+void ABRLogger(const char* levelstr,const char* file, int line,const char *fmt, ...) {
+  int len = 0;
   char logBuf[MAX_LOG_BUFF_SIZE] = {0};
 
-  strcpy(logBuf, moduleName);
-
+  
+  len = sprintf(logBuf, "[AAMP-ABR][%s][%s][%d]",levelstr,file,line);
   va_list args;
   va_start(args, fmt);
-  ret = vsnprintf(logBuf + MODULE_NAME_SIZE, (MAX_LOG_BUFF_SIZE - 1 - MODULE_NAME_SIZE), fmt, args);
+  //t = vsnprintf(logBuf + MODULE_NAME_SIZE, (MAX_LOG_BUFF_SIZE - 1 - MODULE_NAME_SIZE), fmt, args);
+  vsnprintf(logBuf+len, MAX_LOG_BUFF_SIZE-len, fmt, args);
   va_end(args);
 
 #if defined(ENABLE_RDK_LOGGER)
@@ -92,7 +130,7 @@ static int defaultLogger(const char* fmt, ...) {
 #elif defined(USE_SYSLOG_HELPER_PRINT)
   send_logs_to_syslog(logBuf);
 #endif
-  return ret;
+  return ;
 #else // ENABLE_RDK_LOGGER
 #ifdef WIN32
   static bool init;
@@ -103,11 +141,11 @@ static int defaultLogger(const char* fmt, ...) {
 	fprintf(f, "%s", logBuf);
 	fclose(f);
   }
-  return printf("%s", logBuf);
+  printf("%s", logBuf);
 #else
   struct timeval t;
   gettimeofday(&t, NULL);
-  return printf("%ld:%3ld : %s\n", (long int)t.tv_sec, (long int)t.tv_usec / 1000, logBuf);
+  printf("%ld:%3ld : %s\n", (long int)t.tv_sec, (long int)t.tv_usec / 1000, logBuf);
 #endif
 #endif
 }
@@ -116,6 +154,8 @@ static int defaultLogger(const char* fmt, ...) {
  * @brief Initialize the logger to printf
  */
 ABRManager::LoggerFuncType ABRManager::sLogger = defaultLogger;
+
+ABRManager::LoggerFuncType ABRManager::logprintf = defaultLogger;
 
 long ABRManager::mPersistBandwidth = 0;
 long long ABRManager::mPersistBandwidthUpdatedTime = 0;
@@ -137,9 +177,15 @@ ABRManager::ABRManager() :
  * the profile whose bitrate >= the default bitrate.
  */
 int ABRManager::getInitialProfileIndex(bool chooseMediumProfile, const std::string& periodId) {
-  
   int profileCount = getProfileCount();
   int desiredProfileIndex = INVALID_PROFILE;
+
+  if (profileCount == 0) {
+    sLogger("%s:%d No profiles found\n",
+       __FUNCTION__, __LINE__);
+    return desiredProfileIndex;
+  }
+
   if (chooseMediumProfile && profileCount > 1) {
     // get the mid profile from the sorted list
     SortedBWProfileListIter iter = mSortedBWProfileList[periodId].begin();
