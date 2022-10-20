@@ -28,7 +28,15 @@
 #include <chrono>
 #include <cstdio>
 #include <stdarg.h>
+#if !(defined(WIN32) || defined(__APPLE__))
+#if defined(USE_SYSTEMD_JOURNAL_PRINT)
+#define ENABLE_RDK_LOGGER true
 #include <systemd/sd-journal.h>
+#elif defined(USE_SYSLOG_HELPER_PRINT)
+#define ENABLE_RDK_LOGGER true
+#include "syslog_helper_ifc.h"
+#endif
+#endif
 #include <sys/time.h>
 #include <algorithm>
 
