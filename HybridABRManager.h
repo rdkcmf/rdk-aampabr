@@ -204,7 +204,7 @@ class HybridABRManager:public ABRManager
 		 * @return none
 		 */
 
-		void GetDesiredProfileOnBuffer(int currProfileIndex,int &newProfileIndex,double bufferValue,double minBufferNeeded);
+		void GetDesiredProfileOnBuffer(int currProfileIndex,int &newProfileIndex,double bufferValue,double minBufferNeeded,const std::string& periodId= std::string());
 
 		/*
 		 * @brief function to update newprofileindex ,if rampup happen from steady state
@@ -216,7 +216,7 @@ class HybridABRManager:public ABRManager
 		 * @return none
 		 */
 
-		void CheckRampupFromSteadyState(int currProfileIndex,int &newProfileIndex,long nwBandwidth,double bufferValue,long newBandwidth,BitrateChangeReason &mhBitrateReason,int &mMaxBufferCountCheck);
+		void CheckRampupFromSteadyState(int currProfileIndex,int &newProfileIndex,long nwBandwidth,double bufferValue,long newBandwidth,BitrateChangeReason &mhBitrateReason,int &mMaxBufferCountCheck,const std::string& periodId= std::string());
 
 		/*
 		 * @brief function to update newprofileindex ,if rampdown happen from steady state
@@ -225,7 +225,7 @@ class HybridABRManager:public ABRManager
 		 * @params ABR Low Buffer counter
 		 * @return none
 		 */
-		void CheckRampdownFromSteadyState(int currProfileIndex, int &newProfileIndex,BitrateChangeReason &mBitrateReason,int mABRLowBufferCounter);
+		void CheckRampdownFromSteadyState(int currProfileIndex, int &newProfileIndex,BitrateChangeReason &mBitrateReason,int mABRLowBufferCounter,const std::string& periodId= std::string());
 
 		/**
 		 * @brief aampabr_GetCurrentTimeMS

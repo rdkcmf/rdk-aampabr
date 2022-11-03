@@ -286,7 +286,7 @@ bool HybridABRManager::IsLowestProfile(int currentProfileIndex,bool IstrickplayM
  *
  */
 
-void HybridABRManager::GetDesiredProfileOnBuffer(int currProfileIndex,int &newProfileIndex,double bufferValue,double minBufferNeeded)
+void HybridABRManager::GetDesiredProfileOnBuffer(int currProfileIndex,int &newProfileIndex,double bufferValue,double minBufferNeeded,const std::string& periodId)
 {
 	long currentBandwidth = getBandwidthOfProfile(currProfileIndex);
 	long newBandwidth     = getBandwidthOfProfile(newProfileIndex);
@@ -299,7 +299,6 @@ void HybridABRManager::GetDesiredProfileOnBuffer(int currProfileIndex,int &newPr
 			// else retain current profile
 			if(bufferValue < eAAMPAbrConfig.abrMaxBuffer)
 				newProfileIndex = currProfileIndex;
-			AAMPABRLOG_WARN("Rampup attempt due to buffer availability : BufferValue %lf and newProfileIndec %d",bufferValue,newProfileIndex );
 		}
 		else
 		{
@@ -307,9 +306,8 @@ void HybridABRManager::GetDesiredProfileOnBuffer(int currProfileIndex,int &newPr
 			// Also if delta of current profile to new profile is 1 , then ignore the change
 			// if bigger rampdown , then adjust to new profile
 			// else retain current profile
-			if(bufferValue > minBufferNeeded && getRampedDownProfileIndex(currProfileIndex) == newProfileIndex)
+			if(bufferValue > minBufferNeeded && getRampedDownProfileIndex(currProfileIndex,periodId) == newProfileIndex)
 				newProfileIndex = currProfileIndex;
-			AAMPABRLOG_WARN("Rampdown attempt due to buffer availability : BufferValue %lf and newProfileIndec %d",bufferValue,newProfileIndex );
 		}
 	}
 }
@@ -318,10 +316,10 @@ void HybridABRManager::GetDesiredProfileOnBuffer(int currProfileIndex,int &newPr
  *  @brief Get Desired Profile on steady state while rampup
  */
 
-void HybridABRManager::CheckRampupFromSteadyState(int currProfileIndex,int &newProfileIndex,long nwBandwidth,double bufferValue,long newBandwidth,BitrateChangeReason &mhBitrateReason,int &mMaxBufferCountCheck)
+void HybridABRManager::CheckRampupFromSteadyState(int currProfileIndex,int &newProfileIndex,long nwBandwidth,double bufferValue,long newBandwidth,BitrateChangeReason &mhBitrateReason,int &mMaxBufferCountCheck,const std::string& periodId)
 {
 	AAMPABRLOG_INFO("[%s][%d]  currProfileIndex %d, newProfileIndex %d ,nwBandwidth %ld ,bufferValue %lf ,newBandwidth %ld ",__FUNCTION__,__LINE__,currProfileIndex,newProfileIndex,nwBandwidth,bufferValue,newBandwidth);
-	int nProfileIdx = getRampedUpProfileIndex(currProfileIndex);
+	int nProfileIdx = getRampedUpProfileIndex(currProfileIndex,periodId);
 	if(newBandwidth - nwBandwidth < 2000000)
 		newProfileIndex = nProfileIdx;
 	if(newProfileIndex  != currProfileIndex)
@@ -339,12 +337,12 @@ void HybridABRManager::CheckRampupFromSteadyState(int currProfileIndex,int &newP
  * @brief Get Desired Profile on steady state while rampdown
  */
 
-void HybridABRManager::CheckRampdownFromSteadyState(int currProfileIndex, int &newProfileIndex,BitrateChangeReason &mBitrateReason,int mABRLowBufferCounter)
+void HybridABRManager::CheckRampdownFromSteadyState(int currProfileIndex, int &newProfileIndex,BitrateChangeReason &mBitrateReason,int mABRLowBufferCounter,const std::string& periodId)
 {
 	AAMPABRLOG_INFO("[%s][%d] currProfileIndex %d ,newProfileIndex %d, mABRLowBufferCounter %d",__FUNCTION__,__LINE__,currProfileIndex,newProfileIndex,mABRLowBufferCounter);
 	if(mABRLowBufferCounter > eAAMPAbrConfig.abrCacheLength)
 	{
-		newProfileIndex = getRampedDownProfileIndex(currProfileIndex);
+		newProfileIndex = getRampedDownProfileIndex(currProfileIndex,periodId);
 		if(newProfileIndex  != currProfileIndex)
 		{
 			mBitrateReason = eAAMP_BITRATE_CHANGE_BY_BUFFER_EMPTY;
